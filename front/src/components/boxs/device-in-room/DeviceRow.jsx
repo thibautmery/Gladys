@@ -6,7 +6,7 @@ import { DEVICE_FEATURE_TYPES } from '../../../../../server/utils/constants';
 import SensorDeviceFeatureNetatmo from '../../../routes/integration/all/netatmo/Dashboard-box-page/SensorDeviceFeatureNetatmo';
 import CommandDeviceFeatureNetatmo from '../../../routes/integration/all/netatmo/Dashboard-box-page/CommandDeviceFeatureNetatmo';
 
-const COMMAND_FEATURE_TYPES = [DEVICE_FEATURE_TYPES.LIGHT.STRING];
+const COMMAND_FEATURE_TYPES = [DEVICE_FEATURE_TYPES.LIGHT.STRING,DEVICE_FEATURE_TYPES.SETPOINT.DECIMAL];
 
 const DeviceRow = ({ children, ...props }) => {
   // if device is a sensor, we display the sensor deviceFeature

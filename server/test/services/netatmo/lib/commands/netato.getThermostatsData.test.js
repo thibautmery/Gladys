@@ -18,7 +18,7 @@ describe('netatmoManager getThermostatsData', () => {
     const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
     nock(`${netatmoManager.baseUrl}`)
       .get(`/api/getthermostatsdata?access_token=${netatmoManager.token}`)
-      .reply(200, jsonGetThermostatsData);
+      .reply(200, jsonGetThermostatsData); 
     await netatmoManager.getThermostatsData();
     assert.called(gladys.event.emit);
     const sensors = await netatmoManager.getSensors();

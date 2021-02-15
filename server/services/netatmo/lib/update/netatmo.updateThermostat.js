@@ -1,5 +1,6 @@
 const logger = require('../../../../utils/logger');
 const { NETATMO_VALUES } = require('../constants');
+const { NotFoundError } = require('../../../../utils/coreErrors');
 
 /**
  * @description Poll value of a Netatmo devices
@@ -16,18 +17,18 @@ async function updateThermostat(key, device, deviceSelector) {
     let setpointTempValue;
     let setpointModeValue;
     let heatPowerRequestValue;
+    let reachableValue;
     // we process the data from the thermostats
     if (this.devices[key].type === 'NATherm1') {
       try {
+        console.log(this.devices[key].battery_percent)
         batteryValue = this.devices[key].battery_percent;
         temperatureValue = this.devices[key].measured.temperature;
         setpointTempValue = this.devices[key].measured.setpoint_temp;
         setpointModeValue = NETATMO_VALUES.ENERGY.SETPOINT_MODE[this.devices[key].setpoint.setpoint_mode.toUpperCase()];
         heatPowerRequestValue = this.devices[key].therm_relay_cmd;
       } catch (e) {
-        logger.error(
-          `Netatmo : File netatmo.updateThermostat.js - ${this.devices[key].type} ${this.devices[key].name} - save values - error : ${e}`,
-        );
+        throw new NotFoundError(`${this.devices[key].type} ${this.devices[key].name} - save values - ${e}`);
       }
     }
 
@@ -40,12 +41,14 @@ async function updateThermostat(key, device, deviceSelector) {
         setpointModeValue =
           NETATMO_VALUES.ENERGY.SETPOINT_MODE[this.devices[key].room.therm_setpoint_mode.toUpperCase()];
         heatPowerRequestValue = this.devices[key].room.heating_power_request;
-        const reachableValue = this.devices[key].homeStatus.reachable;
+        reachableValue = this.devices[key].homeStatus.reachable;
+      } catch (e) {
+        throw new NotFoundError(`${this.devices[key].type} ${this.devices[key].name} - save values - ${e}`);
+      }
+      try {
         await this.updateFeature(key, device, deviceSelector, 'reachable', reachableValue);
       } catch (e) {
-        logger.error(
-          `Netatmo : File netatmo.updateThermostat.js - Valve ${this.devices[key].type} ${this.devices[key].name} - reachable - error : ${e}`,
-        );
+        throw new NotFoundError(`${this.devices[key].type} ${this.devices[key].name} - reachable - ${e}`);
       }
     }
     // we save the common data of thermostats and valves
@@ -55,6 +58,7 @@ async function updateThermostat(key, device, deviceSelector) {
       logger.error(
         `Netatmo : File netatmo.updateThermostat.js - ${this.devices[key].type} ${this.devices[key].name} - battery - error : ${e}`,
       );
+      throw new NotFoundError(`${this.devices[key].type} ${this.devices[key].name} - battery - error : ${e}`);
     }
     try {
       await this.updateFeature(key, device, deviceSelector, 'temperature', temperatureValue);
@@ -62,6 +66,7 @@ async function updateThermostat(key, device, deviceSelector) {
       logger.error(
         `Netatmo : File netatmo.updateThermostat.js - ${this.devices[key].type} ${this.devices[key].name} - temperature - error : ${e}`,
       );
+      throw new NotFoundError(`${this.devices[key].type} ${this.devices[key].name} - temperature - error : ${e}`);
     }
     try {
       await this.updateFeature(key, device, deviceSelector, 'therm_setpoint_temperature', setpointTempValue);
@@ -69,6 +74,7 @@ async function updateThermostat(key, device, deviceSelector) {
       logger.error(
         `Netatmo : File netatmo.updateThermostat.js - ${this.devices[key].type} ${this.devices[key].name} - therm setpoint temperature - error : ${e}`,
       );
+      throw new NotFoundError(`${this.devices[key].type} ${this.devices[key].name} - therm setpoint temperature - error : ${e}`);
     }
     try {
       await this.updateFeature(key, device, deviceSelector, 'therm_setpoint_mode', setpointModeValue);
@@ -76,6 +82,7 @@ async function updateThermostat(key, device, deviceSelector) {
       logger.error(
         `Netatmo : File netatmo.updateThermostat.js - ${this.devices[key].type} ${this.devices[key].name} - therm setpoint mode - error : ${e}`,
       );
+      throw new NotFoundError(`${this.devices[key].type} ${this.devices[key].name} - therm setpoint mode - error : ${e}`);
     }
     try {
       await this.updateFeature(key, device, deviceSelector, 'heating_power_request', heatPowerRequestValue);
@@ -83,13 +90,10 @@ async function updateThermostat(key, device, deviceSelector) {
       logger.error(
         `Netatmo : File netatmo.updateThermostat.js - ${this.devices[key].type} ${this.devices[key].name} - heating power request - error : ${e}`,
       );
+      throw new NotFoundError(`${this.devices[key].type} ${this.devices[key].name} - heating power request - error : ${e}`);
     }
   } catch (e) {
-    logger.error(
-      `Netatmo : File netatmo.updateThermostat.js - ${this.devices[key] ? this.devices[key].type : '"type"'} ${
-        this.devices[key] ? this.devices[key].name : '"name"'
-      } - error : ${e}`,
-    );
+    throw new NotFoundError(`NETATMO : File netatmo.updateThermostat.js - error : ${e}`);
   }
 }
 

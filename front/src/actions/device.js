@@ -33,6 +33,10 @@ function createActions(store) {
       store.setState(newState);
     },
     async setValue(state, deviceFeatureSelector, value) {
+      console.log("coucou")
+      console.log(state)
+      console.log(deviceFeatureSelector)
+      console.log(value)
       await state.httpClient.post(`/api/v1/device_feature/${deviceFeatureSelector}/value`, {
         value
       });

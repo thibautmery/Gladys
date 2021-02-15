@@ -45,9 +45,9 @@ async function getHomeStatusData() {
             const indexRoomHomeStatus = responseHomeStatus.data.body.home.rooms.findIndex(
               (element) => element.id === valves.room_id,
             );
-
             // then we get the 2nd part of the valves
             valves.homeStatus = responseHomeStatus.data.body.home.modules[indexValveHomeStatus];
+            valves.homeStatus.houseId = home.id;
             // then we get the 3rd part of the valves : rooms
             valves.room = responseHomeStatus.data.body.home.rooms[indexRoomHomeStatus];
 

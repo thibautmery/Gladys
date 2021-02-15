@@ -15,6 +15,7 @@ const {
 function newValueValve(data) {
   const sid = data.id;
 
+            console.log(data.homeStatus.houseId)
   // we create the valve device
   if (data.type === 'NRV') {
     logger.debug(`Netatmo : New valve, sid = ${sid} - ${data.type}`);
@@ -59,7 +60,7 @@ function newValueValve(data) {
           category: DEVICE_FEATURE_CATEGORIES.SETPOINT,
           type: DEVICE_FEATURE_TYPES.SETPOINT.DECIMAL,
           unit: DEVICE_FEATURE_UNITS.CELSIUS,
-          read_only: true,
+          read_only: false,
           keep_history: true,
           has_feedback: true,
           min: 5,
@@ -105,8 +106,8 @@ function newValueValve(data) {
       ],
       params: [
         {
-          name: 'Room_id_valve',
-          value: data.room_id,
+          name: 'House_Room_id_valve',
+          value: `${data.homeStatus.houseId}:${data.room_id}`,
         },
       ],
     };

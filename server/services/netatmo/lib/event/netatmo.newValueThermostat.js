@@ -58,7 +58,7 @@ function newValueThermostat(data) {
           category: DEVICE_FEATURE_CATEGORIES.SETPOINT,
           type: DEVICE_FEATURE_TYPES.SETPOINT.DECIMAL,
           unit: DEVICE_FEATURE_UNITS.CELSIUS,
-          read_only: true,
+          read_only: false,
           keep_history: true,
           has_feedback: true,
           min: 5,
