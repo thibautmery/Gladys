@@ -1,10 +1,11 @@
 const nock = require('nock');
 const { expect } = require('chai');
 const { assert, fake } = require('sinon');
+const sinon = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
 
 const jsonHomeData = require('../../data/getHomeData.json');
-const logger = require('../../../../../utils/logger');
+const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../../utils/constants');
 
 const NetatmoManager = proxyquire('../../../../../services/netatmo/lib/index', {});
 
@@ -47,15 +48,22 @@ describe('netatmoManager getHomeData success', () => {
 });
 
 describe('netatmoManager getHomeData with errors', () => {
-    it('should error on no data camera', async () => {
-    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
+  const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
+  let sensors;
+
+  beforeEach(() => {
+    netatmoManager.devices = {};
+    netatmoManager.sensors = [];
+    gladys.event = {
+      emit: fake.returns(null),
+    };
+    sensors = [];
+  });
+
+  it('should error on no data camera', async () => {
     const jsonDevice = {
       body: {
-        homes: [
-          {
-
-          },
-        ],
+        homes: [{}],
       },
     };
     nock(`${netatmoManager.baseUrl}`)
@@ -65,15 +73,13 @@ describe('netatmoManager getHomeData with errors', () => {
       await netatmoManager.getHomeData();
       assert.fail();
     } catch (error) {
-      logger.info(error.message)
-      expect(error.message).to.equal('NETATMO: No data cameras in getHomeData (camera)');
+      expect(error.message).to.include('NETATMO: No data cameras in getHomeData (camera)');
     }
-    const sensors = await netatmoManager.getSensors();
+    sensors = await netatmoManager.getSensors();
     expect(sensors).to.deep.equal([]);
   });
 
   it('should get NACamera but with module unknown', async () => {
-    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
     const jsonDevice = {
       body: {
         homes: [
@@ -113,7 +119,7 @@ describe('netatmoManager getHomeData with errors', () => {
       .reply(200, jsonDevice);
     await netatmoManager.getHomeData();
     assert.called(gladys.event.emit);
-    const sensors = await netatmoManager.getSensors();
+    sensors = await netatmoManager.getSensors();
 
     sensors.forEach((sensorDevice) => {
       expect(sensorDevice).to.have.property('name');
@@ -138,7 +144,6 @@ describe('netatmoManager getHomeData with errors', () => {
   });
 
   it('should get NACamera without module', async () => {
-    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
     const jsonDevice = {
       body: {
         homes: [
@@ -166,7 +171,7 @@ describe('netatmoManager getHomeData with errors', () => {
       .reply(200, jsonDevice);
     await netatmoManager.getHomeData();
     assert.called(gladys.event.emit);
-    const sensors = await netatmoManager.getSensors();
+    sensors = await netatmoManager.getSensors();
 
     sensors.forEach((sensorDevice) => {
       expect(sensorDevice).to.have.property('name');
@@ -189,7 +194,6 @@ describe('netatmoManager getHomeData with errors', () => {
   });
 
   it('should get error on device unknown', async () => {
-    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
     const jsonDevice = {
       body: {
         homes: [
@@ -216,13 +220,21 @@ describe('netatmoManager getHomeData with errors', () => {
       .post('/api/gethomedata')
       .reply(200, jsonDevice);
     await netatmoManager.getHomeData();
-    assert.called(gladys.event.emit);
-    const sensors = await netatmoManager.getSensors();
+    assert.calledWith(netatmoManager.gladys.event.emit, `${EVENTS.WEBSOCKET.SEND_ALL}`, {
+      type: WEBSOCKET_MESSAGE_TYPES.NETATMO.ERRORDATA,
+      payload: `Files newValueCamera - Device type unknown : NDB`,
+    });
+    assert.neverCalledWith(netatmoManager.gladys.event.emit, `${EVENTS.WEBSOCKET.SEND_ALL}`, {
+      type: WEBSOCKET_MESSAGE_TYPES.NETATMO.NEW_DEVICE,
+      payload: {
+        model: sinon.match(`netatmo-`),
+      },
+    });
+    sensors = await netatmoManager.getSensors();
     expect(sensors).to.deep.equal([]);
   });
 
-  it('should return nothing home', async () => {
-    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
+  it('should error on no data homes and return nothing home', async () => {
     const jsonDeviceNothing = {
       body: {},
     };
@@ -231,18 +243,15 @@ describe('netatmoManager getHomeData with errors', () => {
       .reply(200, jsonDeviceNothing);
     try {
       await netatmoManager.getHomeData();
-      assert.called(gladys.event.emit);
       assert.fail();
     } catch (error) {
-      logger.info(error.message)
-      expect(error.message).to.equal('NETATMO: No data homes in getHomeData (camera)');
+      expect(error.message).to.include('NETATMO: No data homes in getHomeData (camera)');
     }
-    const sensors = await netatmoManager.getSensors();
+    sensors = await netatmoManager.getSensors();
     expect(sensors).to.deep.equal([]);
   });
 
   it('should failed getHomeData', async () => {
-    const netatmoManager = new NetatmoManager(gladys, 'bdba9c11-8541-40a9-9c1d-82cd9402bcc3');
     nock(`${netatmoManager.baseUrl}`)
       .post('/api/gethomedata')
       .reply(400, { data: { body: 'Problem' } });
@@ -250,7 +259,6 @@ describe('netatmoManager getHomeData with errors', () => {
       await netatmoManager.getHomeData();
       assert.fail();
     } catch (error) {
-      logger.error(error.message)
       expect(error.message).to.include('NETATMO: Error on getHomeData (camera)');
     }
   });

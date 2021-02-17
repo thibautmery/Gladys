@@ -21,6 +21,10 @@ class NetatmoNodePage extends Component {
       WEBSOCKET_MESSAGE_TYPES.NETATMO.DISCONNECTED,
       this.props.displayDisconnectedMessage
     );
+    this.props.session.dispatcher.addListener(
+      WEBSOCKET_MESSAGE_TYPES.NETATMO.DISCONNECTED,
+      this.props.displayDisconnectedMessage
+    );
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.NETATMO.ERROR, this.props.displayNetatmoError);
   }
   componentWillUnmount() {

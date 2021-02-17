@@ -436,8 +436,7 @@
             "0": "Schedule",
             "1": "Manual",
             "2": "Frost free",
-            "3": "Away",
-            "4": "Program"
+            "3": "Away"
           },
           "heating_req": {
             "0": "0",
@@ -1446,7 +1445,8 @@
       "dimmer": "Switch Dimmer",
       "burglar": "Switch Burglar",
       "power": "Power consumption",
-      "energy": "Energy consumption"
+      "energy": "Energy consumption",
+      "integer": "Switch 0-100%"
     },
     "siren": {
       "shortCategoryName": "Siren",

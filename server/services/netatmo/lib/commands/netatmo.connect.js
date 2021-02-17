@@ -10,7 +10,6 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants
  */
 async function connect() {
   // get value save by gladys front to connect to Netatmo
-  
   const netatmoClientId = await this.gladys.variable.getValue(CONFIGURATION.NETATMO_CLIENT_ID, this.serviceId);
   const netatmoCientSecret = await this.gladys.variable.getValue(CONFIGURATION.NETATMO_CLIENT_SECRET, this.serviceId);
   const netatmoUsername = await this.gladys.variable.getValue(CONFIGURATION.NETATMO_USERNAME, this.serviceId);
@@ -44,7 +43,6 @@ async function connect() {
     };
     // connect to netatmo api
     let response;
-    
     try {
       response = await axios({
         url: `${this.baseUrl}/oauth2/token`,

@@ -16,19 +16,16 @@ const createActions = store => {
           // We are trying to recover the Username
           netatmoUsername = await state.httpClient.get('/api/v1/service/netatmo/variable/NETATMO_USERNAME');
         } catch (e) {
-
           store.setState({
             netatmoUsername: (netatmoUsername || {}).value,
             netatmoPassword,
             netatmoConnectStatus: RequestStatus.ServiceNotConfigured
           });
         }
-          
         try {
           // We are trying to recover the Username
           netatmoClientId = await state.httpClient.get('/api/v1/service/netatmo/variable/NETATMO_CLIENT_ID');
         } catch (e) {
-
           store.setState({
             netatmoClientId: (netatmoClientId || {}).value,
             netatmoClientSecret,

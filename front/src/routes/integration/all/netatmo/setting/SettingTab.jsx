@@ -26,7 +26,6 @@ const SetupTab = ({ children, ...props }) => {
             <Text id="integration.netatmo.setting.disconnect" />
           </p>
         )}
-        {console.log(props.netatmoConnectStatus)}
         {props.netatmoConnectStatus === RequestStatus.Error && (
           <p class="text-center alert alert-danger">
             <Text id="integration.netatmo.setting.error" />

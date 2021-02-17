@@ -482,8 +482,7 @@
             "0": "Programme",
             "1": "Manuel Boost",
             "2": "Hors-gel",
-            "3": "Absent",
-            "4": "Programme"
+            "3": "Absent"
           },
           "heating_req": {
             "0": "0",
@@ -1446,7 +1445,8 @@
       "dimmer": "Variateur",
       "burglar": "Antivol",
       "power": "Puissance consommée",
-      "energy": "Energie consommée"
+      "energy": "Energie consommée",
+      "integer": "Commutateur 0-100%"
     },
     "siren": {
       "shortCategoryName": "Sirène",
