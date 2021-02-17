@@ -28,7 +28,6 @@ const RenderCommandGlobal = ({ children, ...props }) => {
       props.deviceFeatureIndex,
       newValue
     );
-    // props.updateSetpoint(e)
   }
   return (
     <Localizer>
